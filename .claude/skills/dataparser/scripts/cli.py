@@ -58,8 +58,10 @@ def cmd_encode(args):
     write_tokens(encoded_final, final_tokens)
     store.save(patterns_path)
 
-    # Clean up work file if different from final
-    if current != encoded_final and os.path.exists(current):
+    # Clean up the intermediate work file. Guard against the input file:
+    # when no patterns are found, the phases return the input path unchanged,
+    # and removing it here would destroy the user's original data.
+    if current not in (input_path, encoded_final) and os.path.exists(current):
         os.remove(current)
 
     # Stats
