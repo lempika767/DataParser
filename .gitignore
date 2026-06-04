@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+
+# Generated encoder/decoder outputs (keep source fixtures only)
+*.encoded.txt
+*.patterns.txt
+*.decoded.txt
+*.encoded_work*.txt
