@@ -32,6 +32,11 @@ All library code is in `.claude/skills/dataparser/scripts/dataparser/`:
   - **Phase 2** (`phase2_encode`): global full-stream detection; iterates until convergence.
   - `finalize()` renames the last working file to the canonical output name.
 
+## Rules
+- Always ask clarifying questions before starting planning 
+- Save all results to output folder
+- Never expose anayled original data outside of this project
+
 ### Data flow
 
 ```

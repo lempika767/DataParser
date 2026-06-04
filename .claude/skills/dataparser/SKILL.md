@@ -1,9 +1,11 @@
 ---
 name: dataparser
 description: Use this skill when the user wants to compress, deduplicate, or extract repeated patterns from a large file of whitespace-separated numbers. Trigger on requests like "find patterns in numbers file", "compress number sequence file", "extract repeating templates from <path>", or "parse patterns out of <file>". Runs the bundled Python CLI and reports compression stats.
-model: sonnet
-argument-hint: <file-path>
 ---
+
+# Arguments
+- $ARGUMENTS - original file path (if it's empty, ask the user to provide it)
+
 
 # dataparser skill
 
@@ -15,8 +17,6 @@ Compress a large whitespace-separated number file by finding and replacing repea
 - User wants to compress or deduplicate number sequences
 
 ## How to run
-
-The file path comes from `$ARGUMENTS` (the value passed after `/dataparser`).
 
 ```bash
 python .claude/skills/dataparser/scripts/cli.py encode $ARGUMENTS [--batch-size 5000] [--max-passes 10] [--min-len 2] [--max-len 15] [--out-dir <dir>]
