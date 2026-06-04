@@ -14,7 +14,36 @@ from dataparser.cleanup import run_cleanup, renumber
 from dataparser.decode import decode
 
 
+def _decode_from_input(args):
+    input_path = os.path.abspath(args.input)
+    if not os.path.exists(input_path):
+        print(f"Error: file not found: {input_path}", file=sys.stderr)
+        sys.exit(1)
+
+    basename = os.path.basename(input_path)
+    dir_path = os.path.dirname(input_path)
+    if basename.endswith(".encoded.txt"):
+        stem = basename[: -len(".encoded.txt")]
+    else:
+        stem = os.path.splitext(basename)[0]
+
+    patterns_path = os.path.join(dir_path, stem + ".patterns.txt")
+    if not os.path.exists(patterns_path):
+        print(f"Error: patterns file not found: {patterns_path}", file=sys.stderr)
+        sys.exit(1)
+
+    out_dir = args.out_dir or dir_path
+    os.makedirs(out_dir, exist_ok=True)
+    output_path = os.path.join(out_dir, stem + ".decoded.txt")
+
+    count = decode(input_path, patterns_path, output_path)
+    print(f"Decoded {count} tokens -> {output_path}")
+
+
 def cmd_encode(args):
+    if args.decode:
+        return _decode_from_input(args)
+
     input_path = os.path.abspath(args.input)
     if not os.path.exists(input_path):
         print(f"Error: file not found: {input_path}", file=sys.stderr)
@@ -111,6 +140,8 @@ def main():
     enc.add_argument("--min-len", type=int, default=2)
     enc.add_argument("--max-len", type=int, default=15)
     enc.add_argument("--out-dir", default=None)
+    enc.add_argument("--decode", action="store_true", default=False,
+                     help="Decode the input .encoded.txt file back to numbers")
 
     dec = sub.add_parser("decode", help="Decode an encoded file")
     dec.add_argument("encoded", help="Path to .encoded.txt file")

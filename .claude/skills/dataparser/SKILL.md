@@ -1,10 +1,11 @@
 ---
 name: dataparser
 description: Use this skill when the user wants to compress, deduplicate, or extract repeated patterns from a large file of whitespace-separated numbers. Trigger on requests like "find patterns in numbers file", "compress number sequence file", "extract repeating templates from <path>", or "parse patterns out of <file>". Runs the bundled Python CLI and reports compression stats.
+argument-hint: "<file-path> [--decode] [--batch-size N] [--max-passes N] [--min-len N] [--max-len N] [--out-dir <dir>]"
 ---
 
 # Arguments
-- $ARGUMENTS - original file path (if it's empty, ask the user to provide it)
+- $ARGUMENTS - file path and optional flags (if empty, ask the user). Pass `--decode` to decode an `.encoded.txt` file back to numbers.
 
 
 # dataparser skill
@@ -18,20 +19,23 @@ Compress a large whitespace-separated number file by finding and replacing repea
 
 ## How to run
 
-```bash
-python .claude/skills/dataparser/scripts/cli.py encode $ARGUMENTS [--batch-size 5000] [--max-passes 10] [--min-len 2] [--max-len 15] [--out-dir <dir>]
-```
-
 If `$ARGUMENTS` is empty, ask the user to provide a file path.
 
-Outputs:
-- `<input>.encoded.txt` — token stream with `$id` references replacing repeated patterns
-- `<input>.patterns.txt` — dictionary: `id<TAB>token token ...` per line
-
-To decode back to original:
+**Encode (compress):**
 ```bash
-python .claude/skills/dataparser/scripts/cli.py decode <encoded_file> <patterns_file> [-o <output_path>]
+python .claude/skills/dataparser/scripts/cli.py encode <file> [--batch-size 5000] [--max-passes 10] [--min-len 2] [--max-len 15] [--out-dir <dir>]
 ```
+
+Outputs:
+- `<stem>.encoded.txt` — token stream with `$id` references replacing repeated patterns
+- `<stem>.patterns.txt` — dictionary: `id<TAB>token token ...` per line
+
+**Decode in place** (when `--decode` is passed or `$ARGUMENTS` contains `--decode`):
+```bash
+python .claude/skills/dataparser/scripts/cli.py encode <stem>.encoded.txt --decode [--out-dir <dir>]
+```
+
+The patterns file is discovered automatically as `<stem>.patterns.txt` in the same directory. Output is written to `<stem>.decoded.txt`.
 
 ## What to report back
 After encoding, read the final `.patterns.txt` and report:
